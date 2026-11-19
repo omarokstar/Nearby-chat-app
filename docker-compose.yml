@@ -1,0 +1,64 @@
+services:
+  # ── PostgreSQL + PostGIS ──
+  db:
+    image: postgis/postgis:16-3.5-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:?DB_USER is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-nestjs-chat-app-db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # ── NestJS Backend ──
+  backend:
+    build:
+      context: ./chat-app
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DB_USER:?DB_USER is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_NAME: ${DB_NAME:-nestjs-chat-app-db}
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      DOMAIN: ${DOMAIN:-http://localhost/}
+      SMTP_HOST: ${SMTP_HOST:?SMTP_HOST is required}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER_NAME: ${SMTP_USER_NAME:?SMTP_USER_NAME is required}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:?SMTP_PASSWORD is required}
+    ports:
+      - "3000:3000"
+    volumes:
+      - audio_uploads:/app/uploads/audio
+
+  # ── React Frontend (nginx) ──
+  frontend:
+    build:
+      context: ./chat-app-web
+      dockerfile: Dockerfile
+      args:
+        # Baked into the static build at build time
+        VITE_API_URL: /api
+        VITE_SOCKET_URL: /
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+volumes:
+  pgdata:
+  audio_uploads:
