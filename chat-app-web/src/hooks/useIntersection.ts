@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 
+/**
+ * Hook leveraging IntersectionObserver to detect when a sentinel element enters the viewport.
+ * Used for triggering automated infinite scroll pagination.
+ */
 export function useIntersection(options?: IntersectionObserverInit) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [isVisible, setIsVisible] = useState(false);

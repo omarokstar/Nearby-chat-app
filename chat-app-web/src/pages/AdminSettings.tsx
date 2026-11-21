@@ -6,6 +6,9 @@ import { adminApi } from '../api/admin';
 import { useToastStore } from '../store/toast';
 import { getErrorMessage } from '../utils';
 
+/**
+ * Schema validating the administrative global search radius (0.1 to 500 km, max 2 decimals).
+ */
 const schema = z.object({
   radiusKm: z
     .number({ error: 'Must be a number' })
@@ -16,10 +19,15 @@ const schema = z.object({
 
 type Form = z.infer<typeof schema>;
 
+/**
+ * System Settings administration panel.
+ * Allows workspace administrators to configure global geolocation discovery constraints.
+ */
 export default function AdminSettings() {
   const qc = useQueryClient();
   const addToast = useToastStore((s) => s.addToast);
 
+  // Queries current discovery radius setting
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['admin-radius'],
     queryFn: adminApi.getRadius,
@@ -35,6 +43,7 @@ export default function AdminSettings() {
     values: data ? { radiusKm: data.radiusKm } : undefined,
   });
 
+  // Mutates system discovery radius and refreshes query cache
   const mutation = useMutation({
     mutationFn: (vals: Form) => adminApi.setRadius(vals.radiusKm),
     onSuccess: (res) => {
@@ -48,54 +57,66 @@ export default function AdminSettings() {
   const onSubmit = (vals: Form) => mutation.mutate(vals);
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 space-y-6">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
+    <div className="max-w-xl mx-auto px-4 py-8 space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-[#131313] dark:text-white">Settings</h1>
+        <p className="text-sm text-[#868686] mt-1">Global workspace and system preferences</p>
+      </div>
 
-      <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur rounded-2xl border border-slate-200 dark:border-slate-700/50 shadow-sm p-6 space-y-6">
+      <div className="bg-white dark:bg-[#1a1a1a] rounded-3xl border border-[#E3E3E3] dark:border-[#2a2a2a] shadow-sm p-6 sm:p-8 space-y-6">
         <div>
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Search Radius</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            The maximum distance (in km) within which users can discover each other.
+          <h2 className="text-base font-semibold text-[#131313] dark:text-white">Discovery Search Radius</h2>
+          <p className="text-sm text-[#868686] mt-1">
+            Configure the maximum radius (in kilometers) for nearby user exploration queries.
           </p>
         </div>
 
         {isError && (
-          <div className="rounded-xl bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 px-4 py-3 text-sm" role="alert">
+          <div
+            className="rounded-2xl bg-[#FFF0F0] border border-[#FFDADA] text-[#DD0000] px-4 py-3 text-sm"
+            role="alert"
+          >
             {getErrorMessage(error)}
           </div>
         )}
 
         {isLoading ? (
-          <div className="space-y-3">
-            <div className="h-10 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse-soft" />
-            <div className="h-10 w-32 rounded-xl bg-slate-200 dark:bg-slate-700 animate-pulse-soft" />
+          <div className="space-y-4">
+            <div className="h-11 rounded-2xl bg-[#F8F8F8] dark:bg-[#252525] animate-pulse" />
+            <div className="h-11 w-28 rounded-[14px] bg-[#F8F8F8] dark:bg-[#252525] animate-pulse" />
           </div>
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label htmlFor="radiusKm" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Radius (km)
+              <label htmlFor="radiusKm" className="block text-sm font-medium text-[#131313] dark:text-white mb-1.5">
+                Radius (kilometers)
               </label>
-              <input
-                id="radiusKm"
-                type="number"
-                step="0.01"
-                min="0.1"
-                max="500"
-                {...register('radiusKm', { valueAsNumber: true })}
-                className="w-full max-w-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition"
-              />
+              <div className="relative max-w-xs">
+                <input
+                  id="radiusKm"
+                  type="number"
+                  step="0.01"
+                  min="0.1"
+                  max="500"
+                  {...register('radiusKm', { valueAsNumber: true })}
+                  className="w-full rounded-2xl border border-[#E3E3E3] dark:border-[#333] bg-white dark:bg-[#111] px-4 py-3 text-sm text-[#131313] dark:text-white placeholder-[#868686] focus:outline-none focus:ring-2 focus:ring-[#131313]/20 transition pr-12"
+                />
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium text-[#868686]">
+                  km
+                </span>
+              </div>
               {errors.radiusKm && (
-                <p className="mt-1 text-xs text-rose-500">{errors.radiusKm.message}</p>
+                <p className="mt-1.5 text-xs text-[#DD0000]">{errors.radiusKm.message}</p>
               )}
+              <p className="mt-1.5 text-xs text-[#868686]">Accepted range: 0.1 to 500 km (up to 2 decimals)</p>
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting || !isDirty}
-              className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 text-white font-semibold text-sm shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 active:scale-[0.98] transition disabled:opacity-50"
+              className="px-6 py-2.5 rounded-[14px] bg-[#131313] text-white dark:bg-white dark:text-[#131313] font-medium text-sm hover:opacity-85 active:opacity-75 transition-opacity disabled:opacity-40"
             >
-              {isSubmitting ? 'Saving…' : 'Save'}
+              {isSubmitting ? 'Saving changes…' : 'Save changes'}
             </button>
           </form>
         )}

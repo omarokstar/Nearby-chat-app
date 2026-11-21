@@ -1,3 +1,6 @@
+/**
+ * Returns uppercase initial character from a display name or username.
+ */
 export function getInitials(name: string): string {
   return name.charAt(0).toUpperCase();
 }
@@ -10,6 +13,9 @@ const palette = [
   'bg-pink-500', 'bg-rose-500',
 ];
 
+/**
+ * Computes a deterministic background color from a username string for avatars.
+ */
 export function getAvatarColor(name: string): string {
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
@@ -18,11 +24,17 @@ export function getAvatarColor(name: string): string {
   return palette[Math.abs(hash) % palette.length];
 }
 
+/**
+ * Formats a metric distance into readable meters (< 1km) or kilometers.
+ */
 export function formatDistance(meters: number): string {
   if (meters < 1000) return `${Math.round(meters)} m`;
   return `${(meters / 1000).toFixed(1)} km`;
 }
 
+/**
+ * Formats an ISO date timestamp into relative human-readable time (e.g. "just now", "5m ago").
+ */
 export function formatRelativeTime(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const sec = Math.floor(diff / 1000);
@@ -36,6 +48,9 @@ export function formatRelativeTime(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString();
 }
 
+/**
+ * Formats a date string into calendar headers: 'Today', 'Yesterday', or weekday and date.
+ */
 export function formatDateHeader(dateStr: string): string {
   const d = new Date(dateStr);
   const now = new Date();
@@ -46,12 +61,18 @@ export function formatDateHeader(dateStr: string): string {
   return d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 }
 
+/**
+ * Formats duration seconds into mm:ss audio timer display.
+ */
 export function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = Math.floor(seconds % 60);
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Extracts descriptive error message string from Axios errors or unknown thrown exceptions.
+ */
 export function getErrorMessage(error: unknown): string {
   if (
     typeof error === 'object' &&

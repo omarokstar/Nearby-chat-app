@@ -1,21 +1,27 @@
 import { Link } from 'react-router-dom';
 
+/**
+ * 404 Not Found fallback view rendered when an unknown route is accessed.
+ */
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-brand-50 via-white to-violet-50 dark:from-slate-950 dark:via-slate-900 dark:to-brand-950 px-4">
-      <div className="text-center animate-fade-in space-y-4">
-        <h1 className="text-7xl font-extrabold bg-gradient-to-r from-brand-500 to-violet-500 bg-clip-text text-transparent">
+    <div className="min-h-screen flex items-center justify-center bg-[#F8F8F8] dark:bg-[#111] px-4">
+      <div className="text-center max-w-sm space-y-4">
+        <h1 className="text-8xl font-black text-[#131313] dark:text-white tracking-tighter">
           404
         </h1>
-        <p className="text-lg text-slate-600 dark:text-slate-400">
-          The page you're looking for doesn't exist.
+        <p className="text-base font-medium text-[#131313] dark:text-white">Page not found</p>
+        <p className="text-sm text-[#868686]">
+          The page or user resource you requested could not be located.
         </p>
-        <Link
-          to="/"
-          className="inline-block px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-600 to-violet-600 text-white font-semibold text-sm shadow-lg shadow-brand-500/25 hover:shadow-brand-500/40 transition"
-        >
-          Go Home
-        </Link>
+        <div className="pt-2">
+          <Link
+            to="/"
+            className="inline-flex items-center justify-center px-6 h-11 rounded-[14px] bg-[#131313] text-white dark:bg-white dark:text-[#131313] font-medium text-sm hover:opacity-85 transition-opacity"
+          >
+            Return to Dashboard
+          </Link>
+        </div>
       </div>
     </div>
   );

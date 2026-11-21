@@ -1,5 +1,6 @@
-/* ───────────── Auth ───────────── */
-
+/**
+ * Authentication and active session credentials.
+ */
 export interface UserInfo {
   id: string;
   username: string;
@@ -18,12 +19,16 @@ export interface MessageOnlyResponse {
 
 export type LoginResponse = LoginSuccessResponse | MessageOnlyResponse;
 
+/**
+ * Type guard distinguishing a successful JWT session from an unverified email notice.
+ */
 export function isLoginSuccess(r: LoginResponse): r is LoginSuccessResponse {
   return 'token' in r;
 }
 
-/* ───────────── Users ───────────── */
-
+/**
+ * Geolocation and PostGIS discovery representations.
+ */
 export interface NearbyUser {
   id: string;
   username: string;
@@ -42,8 +47,9 @@ export interface LocationResponse {
   longitude: number;
 }
 
-/* ───────────── Messages ───────────── */
-
+/**
+ * Chat and direct messaging payload entities.
+ */
 export interface Message {
   id: string;
   senderId: string;
@@ -69,8 +75,9 @@ export interface Conversation {
   };
 }
 
-/* ───────────── Admin ───────────── */
-
+/**
+ * Administration, audit, and moderation interfaces.
+ */
 export interface AdminUser {
   id: string;
   username: string;
@@ -94,16 +101,18 @@ export interface RadiusResponse {
   radiusKm: number;
 }
 
-/* ───────────── API Error ───────────── */
-
+/**
+ * Backend HTTP validation and operational error structure.
+ */
 export interface ApiError {
   statusCode: number;
   message: string | string[];
   error: string;
 }
 
-/* ───────────── Socket ───────────── */
-
+/**
+ * WebSocket real-time delivery and acknowledgement contracts.
+ */
 export interface SocketSendAck {
   ok: boolean;
   message?: Message;

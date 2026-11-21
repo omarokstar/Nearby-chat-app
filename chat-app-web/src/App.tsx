@@ -26,19 +26,19 @@ export default function App() {
     <>
       <Toast />
       <Routes>
-        {/* Public */}
+        {/* Unauthenticated public authentication and email activation routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email/:userId/:token" element={<VerifyEmail />} />
 
-        {/* Protected */}
+        {/* Authenticated member routes wrapped in the persistent layout */}
         <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path="/" element={<Nearby />} />
             <Route path="/chats" element={<Chats />} />
             <Route path="/chats/:userId" element={<ChatWindow />} />
 
-            {/* Admin only */}
+            {/* System administration routes restricted to administrator role accounts */}
             <Route element={<AdminRoute />}>
               <Route path="/admin/users" element={<AdminUsers />} />
               <Route path="/admin/settings" element={<AdminSettings />} />
@@ -46,7 +46,7 @@ export default function App() {
           </Route>
         </Route>
 
-        {/* 404 */}
+        {/* Fallback route for unmatched URL paths */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     </>
